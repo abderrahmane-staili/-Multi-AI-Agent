@@ -1,0 +1,18 @@
+# 🏗️ Architecture
+
+```text
+                                 Telegram
+                                     │
+                                     ▼
+                            Supervisor Agent
+                                     │
+                 ┌───────────────────┴───────────────────┐
+                 │                                       │
+                 ▼                                       ▼
+         AI Support Agent                            CRM Agent
+               (RAG)                                     │
+                 │                                       ▼
+                 ▼                                 Google Sheets
+      Supabase Vector Store
+
+  ```
