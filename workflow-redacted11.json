@@ -1,0 +1,378 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=# ROLE\n\nYou manage the conversation.\n\n# AGENTS\n\nAI SUPPORT AGENT\n- Menu\n- Prices\n- Food\n- Restaurant info\n\nAI Agent CRM\n- Customer info\n- Order confirmation\n- Save order\n\n# RULES\n\n- Restaurant questions → AI SUPPORT AGENT.\n- Customer confirms an order → CRM AGENT.\n- Never answer menu questions yourself.\n- Reply only in Arabic.\n- Keep all data retrieved from Supabase exactly as stored.\n- Never translate, modify, or rephrase Supabase data."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [-320, -384],
+      "id": "dd0ca01c-b3f5-41b0-8f58-310be10abb71",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "updates": ["message"],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [-624, -384],
+      "id": "4b685d80-ba2e-4bc2-8c29-0607345272d0",
+      "name": "Telegram Trigger",
+      "webhookId": "REDACTED_WEBHOOK_ID_1",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_CRED_ID",
+          "name": "REDACTED_CRED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [112, -384],
+      "id": "c2d47f26-9cc3-49fe-a7a3-aa9e0e941fea",
+      "name": "Send a text message",
+      "webhookId": "REDACTED_WEBHOOK_ID_2",
+      "credentials": {
+        "telegramApi": {
+          "id": "REDACTED_CRED_ID",
+          "name": "REDACTED_CRED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [-688, 144],
+      "id": "b2980074-1dd9-4597-ab92-26cc3c14d16e",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_CRED_ID",
+          "name": "REDACTED_CRED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [-608, 144],
+      "id": "f922a2e2-b489-4e81-831f-6ad0efac6dbf",
+      "name": "Memory",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED_CRED_ID",
+          "name": "REDACTED_CRED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Get the data frome project1",
+        "tableName": {
+          "__rl": true,
+          "value": "project1",
+          "mode": "list",
+          "cachedResultName": "project1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [-512, 144],
+      "id": "6c2f0c0e-c2f7-4572-a2df-a8b6985bf10a",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REDACTED_CRED_ID",
+          "name": "REDACTED_CRED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [-560, 272],
+      "id": "8bea1270-074d-4973-acfc-e77679a55502",
+      "name": "Embedding",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_CRED_ID",
+          "name": "REDACTED_CRED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# CRM",
+        "height": 512,
+        "width": 464,
+        "color": "#393838"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-112, -112],
+      "typeVersion": 1,
+      "id": "4fa158c5-bf8f-4433-b37e-fda8e6ab8f29",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [32, 144],
+      "id": "96d219ba-f623-48db-b0c5-6e3d53b0dbbb",
+      "name": "Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED_CRED_ID",
+          "name": "REDACTED_CRED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [-80, 144],
+      "id": "de171082-0682-4d15-a1ba-a8baa60b8937",
+      "name": "Open-AI",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_CRED_ID",
+          "name": "REDACTED_CRED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REDACTED_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "muli-agent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/REDACTED_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NAME": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('NAME', ``, 'string') }}",
+            "PHONE": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('PHONE', ``, 'string') }}",
+            "LOCALISATION": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('LOCALISATION', ``, 'string') }}",
+            "ORDER": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ORDER', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {"id": "NAME", "displayName": "NAME", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "PHONE", "displayName": "PHONE", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "LOCALISATION", "displayName": "LOCALISATION", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true},
+            {"id": "ORDER", "displayName": "ORDER", "required": false, "defaultMatch": false, "display": true, "type": "string", "canBeUsedToMatch": true}
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [208, 144],
+      "id": "3744f26a-20f5-456a-b920-d35026ace153",
+      "name": "Append row-sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED_CRED_ID",
+          "name": "REDACTED_CRED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# multi-ai-agent",
+        "height": 1008,
+        "width": 1408,
+        "color": "#00142E"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-928, -592],
+      "typeVersion": 1,
+      "id": "dd2285bc-d2b4-42bf-b279-ce7fa6e9216d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "=# ROLE\n\nYou collect and save confirmed orders.\n\n# TOOL\n\n- Google Sheets\n\n# SCHEMA\n\nname\nphone NB\nlocalisation\norder\n\n# RULES\n\nCollect:\n- Name\n- Phone\n- Address\n- Final Order\n\nIf something is missing, ask only for it.\n\nAfter customer confirmation:\n- Append a new row.\n\nReply only in Arabic.\n\n# DO NOT\n\nAnswer menu or price questions."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [0, -32],
+      "id": "3be83cd4-2205-485a-92e1-5fc183c0df12",
+      "name": "AI Agent CRM"
+    },
+    {
+      "parameters": {
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "=# ROLE\n\nYou answer restaurant questions using ONLY the Supabase Vector Store.\n\n# TOOL\n\n- Supabase Vector Store\n\n# RULES\n\n- Search Supabase before every answer.\n- Never invent menu items, prices or information.\n- If nothing is found, reply:\n\"عذراً، لم أجد هذه المعلومة.\"\n- Reply only in Arabic.\n- Keep all data retrieved from Supabase exactly as stored.\n- Never translate, modify, or rephrase Supabase data.\n\n# DO NOT\n\n- Collect customer info.\n- Confirm orders.\n- Save data."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 3,
+      "position": [-640, -32],
+      "id": "283f06e6-4458-416e-9cf5-874926cdf2ea",
+      "name": "AI SUPORT AGENT"
+    },
+    {
+      "parameters": {
+        "content": "# DATA AND CHAT-SUPORT",
+        "height": 512,
+        "width": 464,
+        "color": "#393838"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [-720, -112],
+      "typeVersion": 1,
+      "id": "07e80744-48af-4a2d-aea5-c80cba98da06",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [-336, -544],
+      "id": "21765422-285f-4640-b6f2-46829efc81d8",
+      "name": "Postgres1",
+      "credentials": {
+        "postgres": {
+          "id": "REDACTED_CRED_ID",
+          "name": "REDACTED_CRED_NAME"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [-176, -544],
+      "id": "5dd23ad1-75ad-468c-9344-d8016bb4fbba",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "REDACTED_CRED_ID",
+          "name": "REDACTED_CRED_NAME"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [[{"node": "Send a text message", "type": "main", "index": 0}]]
+    },
+    "Telegram Trigger": {
+      "main": [[{"node": "AI Agent", "type": "main", "index": 0}]]
+    },
+    "Send a text message": {
+      "main": [[]]
+    },
+    "OpenAI": {
+      "ai_languageModel": [[{"node": "AI SUPORT AGENT", "type": "ai_languageModel", "index": 0}]]
+    },
+    "Memory": {
+      "ai_memory": [[{"node": "AI SUPORT AGENT", "type": "ai_memory", "index": 0}]]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [[{"node": "AI SUPORT AGENT", "type": "ai_tool", "index": 0}]]
+    },
+    "Embedding": {
+      "ai_embedding": [[{"node": "Supabase Vector Store", "type": "ai_embedding", "index": 0}]]
+    },
+    "Postgres": {
+      "ai_memory": [[{"node": "AI Agent CRM", "type": "ai_memory", "index": 0}]]
+    },
+    "Open-AI": {
+      "ai_languageModel": [[{"node": "AI Agent CRM", "type": "ai_languageModel", "index": 0}]]
+    },
+    "Append row-sheet": {
+      "ai_tool": [[{"node": "AI Agent CRM", "type": "ai_tool", "index": 0}]]
+    },
+    "AI Agent CRM": {
+      "ai_tool": [[{"node": "AI Agent", "type": "ai_tool", "index": 0}]]
+    },
+    "AI SUPORT AGENT": {
+      "ai_tool": [[{"node": "AI Agent", "type": "ai_tool", "index": 0}]]
+    },
+    "Postgres1": {
+      "ai_memory": [[{"node": "AI Agent", "type": "ai_memory", "index": 0}]]
+    },
+    "OpenAI1": {
+      "ai_languageModel": [[{"node": "AI Agent", "type": "ai_languageModel", "index": 0}]]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "REDACTED_INSTANCE_ID"
+  }
+}
