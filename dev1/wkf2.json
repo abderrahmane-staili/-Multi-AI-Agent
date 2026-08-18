@@ -1,0 +1,353 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2ea0cabf-6888-4095-889b-e77bbeb23667",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "fb79c9dd-cc79-4003-b966-37f1ceec2e1b",
+              "name": "imagePath",
+              "value": "={{ $json.imagePath }}",
+              "type": "string"
+            },
+            {
+              "id": "c601c678-9952-4c82-a4e0-d6813ceda59d",
+              "name": "comment",
+              "value": "={{ $json.comment }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -624,
+        -112
+      ],
+      "id": "404507e3-037a-430b-96cd-4f4a0d30343e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1360,
+        -112
+      ],
+      "id": "e9f8fdf5-c5df-45ae-8c49-a0f06cb6899d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  // Check all possible field names from Google Sheets node\n  let rawImage = item.json.image || item.json.imagePath || item.json.image_url || \"\";\n  rawImage = rawImage.trim();\n\n  // Remove file:/// or file://\n  let cleanImage = rawImage.replace(/^file:\\/\\/\\/?/i, \"\");\n\n  return {\n    json: {\n      title: item.json.title ? item.json.title.replace(/[\\r\\n]+/g, \" \").trim() : \"\",\n      imagePath: cleanImage,\n      comment: item.json.comment ? item.json.comment.trim() : \"\"\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -832,
+        -112
+      ],
+      "id": "647708b6-a581-43c5-9393-ea0468e5f68b",
+      "name": "JavaScript Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  return {\n    json: {\n      title: item.json.title ? item.json.title.replace(/[\\r\\n]+/g, \" \").trim() : \"\",\n      imagePath: item.json.image ? item.json.image.trim() : \"\",\n      comment: item.json.comment ? item.json.comment.trim() : \"\"\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1008,
+        -112
+      ],
+      "id": "253fe66b-db06-4485-9f2e-1af0e21a5e00",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1FW1JPm4LP7g691z5OTZrelnlHwxyLtxQ6Kj3-lD8xgg",
+          "mode": "list",
+          "cachedResultName": "muli-agent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FW1JPm4LP7g691z5OTZrelnlHwxyLtxQ6Kj3-lD8xgg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 888244645,
+          "mode": "list",
+          "cachedResultName": "test playwright",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FW1JPm4LP7g691z5OTZrelnlHwxyLtxQ6Kj3-lD8xgg/edit#gid=888244645"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1184,
+        -112
+      ],
+      "id": "d2c8b062-e311-4699-8ebc-5f2d5d3e2bc9",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "jrUYZ2Yv7SlOEnnI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -336,
+        -112
+      ],
+      "id": "41f6ab24-c7ea-4008-bd76-6a0c0ed3b5d5",
+      "name": "Loop 1"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        608,
+        -336
+      ],
+      "id": "3c92e83c-6ab8-4e20-9b29-3698ffac59b0",
+      "name": "Wait",
+      "webhookId": "ba28073c-73d4-437b-ab19-528034973890"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. استخراج الـ Items اللي جايين من Loop 1\nconst inputItems = $input.all();\n\n// 2. إنشاء Unique Hash لكل Batch بناءً على الوقت والـ Data\n// هادشي كيجبر loop 2 تعامل مع البيانات كأنها أول مرة تشوفها فـ Memory\nconst timestamp = Date.now();\n\nreturn inputItems.map((item, index) => {\n  return {\n    json: {\n      // تفكيك البيانات القديمة بالكامل (Deep Clone)\n      ...JSON.parse(JSON.stringify(item.json)),\n      // إشارة تتبع ديموغرافية كتجبر الـ Memory تدير Reset\n      _batchContextId: `batch_${timestamp}_${index}`\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        -96
+      ],
+      "id": "97ead334-65a3-4bfa-a595-5f1b26970df7",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        288,
+        -96
+      ],
+      "id": "0ca3ed89-9bfd-48a5-937d-8798a93116e3",
+      "name": "loop 2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26e52d62-67ee-470c-945e-864ed5499b1a",
+              "name": "title",
+              "value": "={{ $('Loop 1').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "240582bf-e209-4186-a79a-e073d6a994cc",
+              "name": "imagePath",
+              "value": "={{ $('Loop 1').item.json.imagePath }}",
+              "type": "string"
+            },
+            {
+              "id": "dcd94596-1fcd-4b0d-b7ad-8ad45058a191",
+              "name": "comment",
+              "value": "={{ $('Loop 1').item.json.comment }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        16
+      ],
+      "id": "d821c661-38b2-4cb7-b0fd-ca79717656b1",
+      "name": "Edit Fields21"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        16
+      ],
+      "id": "db4fb8fd-8140-47e4-beb3-e545ec25947c",
+      "name": "Wait1",
+      "webhookId": "76cbb1b5-2ed8-415c-ae4e-c23d02a2ea0c"
+    }
+  ],
+  "connections": {
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Loop 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JavaScript Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "JavaScript Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop 1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "loop 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "loop 2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields21": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "loop 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "500acbc15071f27dd48d1ec68955f9a2da0e93e5405945678b09708cd048df90"
+  }
+}
