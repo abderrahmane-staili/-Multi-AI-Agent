@@ -1,0 +1,327 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -992,
+        160
+      ],
+      "id": "63da1949-8f84-477a-8372-743a041cad5d",
+      "name": "Schedule Trigger5"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1FW1JPm4LP7g691z5OTZrelnlHwxyLtxQ6Kj3-lD8xgg",
+          "mode": "list",
+          "cachedResultName": "muli-agent",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FW1JPm4LP7g691z5OTZrelnlHwxyLtxQ6Kj3-lD8xgg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 888244645,
+          "mode": "list",
+          "cachedResultName": "test playwright",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FW1JPm4LP7g691z5OTZrelnlHwxyLtxQ6Kj3-lD8xgg/edit#gid=888244645"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -784,
+        160
+      ],
+      "id": "79576a31-0da5-41e6-8f59-3110641fc37d",
+      "name": "Get row(s) in sheet11",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "jrUYZ2Yv7SlOEnnI",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  return {\n    json: {\n      title: item.json.title ? item.json.title.replace(/[\\r\\n]+/g, \" \").trim() : \"\",\n      imagePath: item.json.image ? item.json.image.trim() : \"\",\n      comment: item.json.comment ? item.json.comment.trim() : \"\"\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -592,
+        160
+      ],
+      "id": "b91eac5d-4599-41ca-a94a-fe07a2f479ce",
+      "name": "Code in JavaScript16"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b6933eb9-422b-4106-88e5-6a293ad42fd8",
+              "name": "imagePath",
+              "value": "={{ $json.imagePath }}",
+              "type": "string"
+            },
+            {
+              "id": "1a5b6332-ec02-4b98-b2ca-ab2f61a55142",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "48e5d770-6d60-467b-83c1-1a7351b9411a",
+              "name": "comment",
+              "value": "={{ $('Get row(s) in sheet11').item.json.comment }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -224,
+        160
+      ],
+      "id": "715102d1-3460-4c20-87db-ee6109a4a0c2",
+      "name": "Edit Fields19"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  // Check all possible field names from Google Sheets node\n  let rawImage = item.json.image || item.json.imagePath || item.json.image_url || \"\";\n  rawImage = rawImage.trim();\n\n  // Remove file:/// or file://\n  let cleanImage = rawImage.replace(/^file:\\/\\/\\/?/i, \"\");\n\n  return {\n    json: {\n      title: item.json.title ? item.json.title.replace(/[\\r\\n]+/g, \" \").trim() : \"\",\n      imagePath: cleanImage,\n      comment: item.json.comment ? item.json.comment.trim() : \"\"\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        160
+      ],
+      "id": "f1f42f4c-1cc2-4d0e-a44f-497dedc54380",
+      "name": "JavaScript Code5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0686501d-ca9d-40ff-a718-971fba439d8e",
+              "name": "imagePath",
+              "value": "={{ $json.imagePath }}",
+              "type": "string"
+            },
+            {
+              "id": "6d19b923-13ab-4f84-b557-0687426ee0e3",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "4935ad4a-a7e2-43c8-b5fd-c090e04cede5",
+              "name": "comment",
+              "value": "={{ $json.comment }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        80
+      ],
+      "id": "e52c3e6c-71d6-49c8-b8c3-8d508417db90",
+      "name": "Edit Fields20"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28810418-979e-44e6-a82a-ec8167fa9091",
+              "name": "imagePath",
+              "value": "={{ $json.imagePath }}",
+              "type": "string"
+            },
+            {
+              "id": "0e2a594c-14c9-4218-8ab9-c0fe2d2d7552",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "d57cceca-faa3-4604-8edd-68b36595d82b",
+              "name": "comment",
+              "value": "={{ $json.comment }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        784,
+        176
+      ],
+      "id": "35d922b5-b505-43eb-b780-22ff2898350b",
+      "name": "Edit Fields21"
+    },
+    {
+      "parameters": {
+        "batchSize": 3,
+        "options": {
+          "reset": true
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8aa2e17e-653b-4b33-adc9-562833742690",
+      "name": "Loop 1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        544,
+        80
+      ],
+      "id": "5ced30f8-1282-47f6-912f-ce83ca7a4b61",
+      "name": "loop 2"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger5": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet11": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript16",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript16": {
+      "main": [
+        [
+          {
+            "node": "JavaScript Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields19": {
+      "main": [
+        [
+          {
+            "node": "Loop 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JavaScript Code5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields19",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields20": {
+      "main": [
+        [
+          {
+            "node": "loop 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields21": {
+      "main": [
+        [
+          {
+            "node": "loop 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop 1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields20",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "loop 2": {
+      "main": [
+        [
+          {
+            "node": "Loop 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "500acbc15071f27dd48d1ec68955f9a2da0e93e5405945678b09708cd048df90"
+  }
+}
